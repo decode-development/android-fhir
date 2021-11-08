@@ -49,6 +49,7 @@ object Dependencies {
     const val kotlinCoroutinesTest =
       "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.kotlinCoroutinesCore}"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.Kotlin.stdlib}"
+    const val kotlinSerializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serializationJson}"
   }
 
   object Lifecycle {
@@ -135,6 +136,7 @@ object Dependencies {
       const val androidxCoreKtx = "1.2.0"
       const val kotlinCoroutinesCore = "1.4.2"
       const val stdlib = "1.5.31"
+      const val serializationJson = "1.3.0"
     }
 
     const val apacheCommonsCompress = "1.20"
