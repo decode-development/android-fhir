@@ -49,7 +49,8 @@ object Dependencies {
     const val kotlinCoroutinesTest =
       "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.kotlinCoroutinesCore}"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.Kotlin.stdlib}"
-    const val kotlinSerializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serializationJson}"
+    const val kotlinSerializationJson =
+      "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.Kotlin.serializationJson}"
   }
 
   object Lifecycle {
