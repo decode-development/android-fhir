@@ -76,6 +76,17 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
     }
   }
 
+  override suspend fun <R : Resource> replaceLocalWithRemote(
+    resource: R,
+    changes: List<LocalChangeEntity>
+  ) {
+    db.withTransaction {
+      resourceDao.update(resource)
+      localChangeDao.discardLocalChangesForResource(resource.logicalId, resource.resourceType)
+      changes.forEach { localChangeDao.addLocalChange(it) }
+    }
+  }
+
   override suspend fun <R : Resource> select(clazz: Class<R>, id: String): R {
     return db.withTransaction {
       val type = getResourceType(clazz)

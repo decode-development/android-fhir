@@ -43,6 +43,14 @@ internal interface Database {
   suspend fun <R : Resource> insertRemote(vararg resource: R)
 
   /**
+   * Replaces the resource and local changes in the FHIR resource database.
+   *
+   * @param resource The [Resource]
+   * @param changes The [List] of [LocalChangeEntity] which have not yet been synced to the server
+   */
+  suspend fun <R : Resource> replaceLocalWithRemote(resource: R, changes: List<LocalChangeEntity>)
+
+  /**
    * Updates the `resource` in the FHIR resource database. If the resource does not already exist,
    * then it will not be created.
    *
