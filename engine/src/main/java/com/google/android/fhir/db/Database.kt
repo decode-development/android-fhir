@@ -26,7 +26,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** The interface for the FHIR resource database. */
-internal interface Database {
+interface Database {
   /**
    * Inserts a list of local `resources` into the FHIR resource database. If any of the resources
    * already exists, it will be overwritten.
