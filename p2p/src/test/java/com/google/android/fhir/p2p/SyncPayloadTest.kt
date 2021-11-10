@@ -18,10 +18,12 @@ package com.google.android.fhir.p2p
 
 import ca.uhn.fhir.context.FhirContext
 import com.google.common.truth.Truth.assertThat
+import java.time.Instant
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.BlockJUnit4ClassRunner
@@ -30,10 +32,11 @@ import org.junit.runners.BlockJUnit4ClassRunner
 class SyncPayloadTest {
   @Test
   fun encodeToStringEncodesThePayloadToAJsonString() {
-    val resourceType = "Patient"
     val resourceId = "abc"
+    val resourceType = ResourceType.Patient
+    val lastUpdatedDate = Instant.now().toString()
     val resource = Patient().apply { id = resourceId }
-    val encodedResource = FhirContext.forR4().newJsonParser().encodeResourceToString(resource)
+    val serializedResource = FhirContext.forR4().newJsonParser().encodeResourceToString(resource)
     val patch = "[{\"op\":\"add\"}]"
     val createTimestamp = "2021-11-03"
     val updateTimestamp = "2021-11-04"
@@ -42,44 +45,50 @@ class SyncPayloadTest {
     val encoded =
       Json.encodeToString(
         SyncPayload(
-          resource,
+          resourceId,
+          resourceType,
+          lastUpdatedDate,
+          serializedResource,
           listOf(
-            RemoteChange.Create(createTimestamp, encodedResource),
-            RemoteChange.Update(updateTimestamp, resourceType, resourceId, patch),
-            RemoteChange.Delete(deleteTimestamp, resourceType, resourceId),
+            RemoteChange.Create(createTimestamp, serializedResource),
+            RemoteChange.Update(updateTimestamp, patch),
+            RemoteChange.Delete(deleteTimestamp),
           )
         )
       )
 
     assertThat(encoded)
       .isEqualTo(
-        """{"resource":${Json.encodeToString(encodedResource)},"changes":[{"type":"create","timestamp":${Json.encodeToString(createTimestamp)},"resource":${Json.encodeToString(encodedResource)}},{"type":"update","timestamp":${Json.encodeToString(updateTimestamp)},"resourceType":${Json.encodeToString(resourceType)},"resourceId":${Json.encodeToString(resourceId)},"patch":${Json.encodeToString(patch)}},{"type":"delete","timestamp":${Json.encodeToString(deleteTimestamp)},"resourceType":${Json.encodeToString(resourceType)},"resourceId":${Json.encodeToString(resourceId)}}]}"""
+        """{"resourceId":${Json.encodeToString(resourceId)},"resourceType":${Json.encodeToString(resourceType)},"lastUpdatedDate":${Json.encodeToString(lastUpdatedDate)},"serializedResource":${Json.encodeToString(serializedResource)},"changes":[{"type":"create","timestamp":${Json.encodeToString(createTimestamp)},"resource":${Json.encodeToString(serializedResource)}},{"type":"update","timestamp":${Json.encodeToString(updateTimestamp)},"patch":${Json.encodeToString(patch)}},{"type":"delete","timestamp":${Json.encodeToString(deleteTimestamp)}}]}"""
       )
   }
 
   @Test
   fun decodeFromStringDecodesThePayloadFromAJsonString() {
-    val resourceType = "Patient"
-    val resourceId = "asdf"
+    val resourceId = "abc"
+    val resourceType = ResourceType.Patient
+    val lastUpdatedDate = Instant.now().toString()
     val resource = Patient().apply { id = resourceId }
-    val encodedResource = FhirContext.forR4().newJsonParser().encodeResourceToString(resource)
+    val serializedResource = FhirContext.forR4().newJsonParser().encodeResourceToString(resource)
     val patch = "[{\"op\":\"add\"}]"
     val createTimestamp = "2021-11-03"
     val updateTimestamp = "2021-11-04"
     val deleteTimestamp = "2021-11-05"
     val payload =
-      """{"resource":${Json.encodeToString(encodedResource)},"changes":[{"type":"create","timestamp":${Json.encodeToString(createTimestamp)},"resource":${Json.encodeToString(encodedResource)}},{"type":"update","timestamp":${Json.encodeToString(updateTimestamp)},"resourceType":${Json.encodeToString(resourceType)},"resourceId":${Json.encodeToString(resourceId)},"patch":${Json.encodeToString(patch)}},{"type":"delete","timestamp":${Json.encodeToString(deleteTimestamp)},"resourceType":${Json.encodeToString(resourceType)},"resourceId":${Json.encodeToString(resourceId)}}]}"""
+      """{"resourceId":${Json.encodeToString(resourceId)},"resourceType":${Json.encodeToString(resourceType)},"lastUpdatedDate":${Json.encodeToString(lastUpdatedDate)},"serializedResource":${Json.encodeToString(serializedResource)},"changes":[{"type":"create","timestamp":${Json.encodeToString(createTimestamp)},"resource":${Json.encodeToString(serializedResource)}},{"type":"update","timestamp":${Json.encodeToString(updateTimestamp)},"patch":${Json.encodeToString(patch)}},{"type":"delete","timestamp":${Json.encodeToString(deleteTimestamp)}}]}"""
 
     val decoded: SyncPayload = Json.decodeFromString(payload)
 
-    assertThat(decoded.resource).isInstanceOf(Patient::class.java)
-    assertThat(decoded.resource.idElement.idPart).isEqualTo(resourceId)
+    assertThat(decoded.resourceId).isEqualTo(resourceId)
+    assertThat(decoded.resourceType).isEqualTo(ResourceType.Patient)
+    assertThat(decoded.lastUpdatedDate).isEqualTo(lastUpdatedDate)
+    assertThat(decoded.serializedResource).isEqualTo(serializedResource)
     assertThat(decoded.changes)
       .isEqualTo(
         listOf(
-          RemoteChange.Create(createTimestamp, encodedResource),
-          RemoteChange.Update(updateTimestamp, resourceType, resourceId, patch),
-          RemoteChange.Delete(deleteTimestamp, resourceType, resourceId),
+          RemoteChange.Create(createTimestamp, serializedResource),
+          RemoteChange.Update(updateTimestamp, patch),
+          RemoteChange.Delete(deleteTimestamp),
         )
       )
   }
