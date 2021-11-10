@@ -31,7 +31,7 @@ class SyncPayloadTest {
   fun encodeToStringEncodesThePayloadToAJsonString() {
     val resourceType = "Patient"
     val resourceId = "abc"
-    val resource = Patient().apply { this.id = resourceId }
+    val resource = Patient().apply { id = resourceId }
     val encodedResource = FhirContext.forR4().newJsonParser().encodeResourceToString(resource)
     val patch = "[{\"op\":\"add\"}]"
     val createTimestamp = "2021-11-03"
@@ -52,7 +52,7 @@ class SyncPayloadTest {
 
     assertThat(encoded)
       .isEqualTo(
-        """{"resource":${Json.encodeToString(encodedResource)},"changes":[{"type":"create","timestamp":"$createTimestamp","resource":${Json.encodeToString(encodedResource)}},{"type":"update","timestamp":"$updateTimestamp","resourceType":"$resourceType","resourceId":"$resourceId","patch":${Json.encodeToString(patch)}},{"type":"delete","timestamp":"$deleteTimestamp","resourceType":"$resourceType","resourceId":"$resourceId"}]}"""
+        """{"resource":${Json.encodeToString(encodedResource)},"changes":[{"type":"create","timestamp":${Json.encodeToString(createTimestamp)},"resource":${Json.encodeToString(encodedResource)}},{"type":"update","timestamp":${Json.encodeToString(updateTimestamp)},"resourceType":${Json.encodeToString(resourceType)},"resourceId":${Json.encodeToString(resourceId)},"patch":${Json.encodeToString(patch)}},{"type":"delete","timestamp":${Json.encodeToString(deleteTimestamp)},"resourceType":${Json.encodeToString(resourceType)},"resourceId":${Json.encodeToString(resourceId)}}]}"""
       )
   }
 }
