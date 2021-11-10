@@ -29,6 +29,7 @@ android {
 
 dependencies {
   implementation(project(":engine"))
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.kotlinSerializationJson)
   api(Dependencies.HapiFhir.structuresR4)
   testImplementation(Dependencies.junit)
