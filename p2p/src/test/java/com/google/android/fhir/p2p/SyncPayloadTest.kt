@@ -72,7 +72,7 @@ class SyncPayloadTest {
 
     val decoded: SyncPayload = Json.decodeFromString(payload)
 
-    assertThat(decoded.resource.fhirType()).isEqualTo(resourceType)
+    assertThat(decoded.resource).isInstanceOf(Patient::class.java)
     assertThat(decoded.resource.idElement.idPart).isEqualTo(resourceId)
     assertThat(decoded.changes)
       .isEqualTo(
