@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.db
 
+import androidx.room.RoomDatabase
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -104,4 +105,9 @@ internal interface Database {
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
+
+  /**
+   * @see RoomDatabase
+   */
+  suspend fun <R> withTransaction(block: suspend () -> R): R
 }

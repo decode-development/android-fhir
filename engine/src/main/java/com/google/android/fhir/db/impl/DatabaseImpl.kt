@@ -150,6 +150,10 @@ internal class DatabaseImpl(context: Context, private val iParser: IParser, inMe
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
   }
 
+  override suspend fun <R> withTransaction(block: suspend () -> R): R {
+    return db.withTransaction(block)
+  }
+
   companion object {
     private const val DEFAULT_DATABASE_NAME = "fhirEngine"
   }
