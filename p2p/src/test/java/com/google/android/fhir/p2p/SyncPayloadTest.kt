@@ -34,7 +34,7 @@ class SyncPayloadTest {
   fun encodeToStringEncodesThePayloadToAJsonString() {
     val resourceId = "abc"
     val resourceType = ResourceType.Patient
-    val lastUpdatedDate = Instant.now().toString()
+    val lastUpdateTimestamp = Instant.now().toString()
     val resource = Patient().apply { id = resourceId }
     val serializedResource = FhirContext.forR4().newJsonParser().encodeResourceToString(resource)
     val patch = "[{\"op\":\"add\"}]"
@@ -47,7 +47,7 @@ class SyncPayloadTest {
         SyncPayload(
           resourceId,
           resourceType,
-          lastUpdatedDate,
+          lastUpdateTimestamp,
           serializedResource,
           listOf(
             RemoteChange.Create(createTimestamp, serializedResource),
@@ -59,7 +59,7 @@ class SyncPayloadTest {
 
     assertThat(encoded)
       .isEqualTo(
-        """{"resourceId":${Json.encodeToString(resourceId)},"resourceType":${Json.encodeToString(resourceType)},"lastUpdatedDate":${Json.encodeToString(lastUpdatedDate)},"serializedResource":${Json.encodeToString(serializedResource)},"changes":[{"type":"create","timestamp":${Json.encodeToString(createTimestamp)},"resource":${Json.encodeToString(serializedResource)}},{"type":"update","timestamp":${Json.encodeToString(updateTimestamp)},"patch":${Json.encodeToString(patch)}},{"type":"delete","timestamp":${Json.encodeToString(deleteTimestamp)}}]}"""
+        """{"resourceId":${Json.encodeToString(resourceId)},"resourceType":${Json.encodeToString(resourceType)},"lastUpdateTimestamp":${Json.encodeToString(lastUpdateTimestamp)},"serializedResource":${Json.encodeToString(serializedResource)},"changes":[{"type":"create","timestamp":${Json.encodeToString(createTimestamp)},"resource":${Json.encodeToString(serializedResource)}},{"type":"update","timestamp":${Json.encodeToString(updateTimestamp)},"patch":${Json.encodeToString(patch)}},{"type":"delete","timestamp":${Json.encodeToString(deleteTimestamp)}}]}"""
       )
   }
 
@@ -67,7 +67,7 @@ class SyncPayloadTest {
   fun decodeFromStringDecodesThePayloadFromAJsonString() {
     val resourceId = "abc"
     val resourceType = ResourceType.Patient
-    val lastUpdatedDate = Instant.now().toString()
+    val lastUpdateTimestamp = Instant.now().toString()
     val resource = Patient().apply { id = resourceId }
     val serializedResource = FhirContext.forR4().newJsonParser().encodeResourceToString(resource)
     val patch = "[{\"op\":\"add\"}]"
@@ -75,13 +75,13 @@ class SyncPayloadTest {
     val updateTimestamp = "2021-11-04"
     val deleteTimestamp = "2021-11-05"
     val payload =
-      """{"resourceId":${Json.encodeToString(resourceId)},"resourceType":${Json.encodeToString(resourceType)},"lastUpdatedDate":${Json.encodeToString(lastUpdatedDate)},"serializedResource":${Json.encodeToString(serializedResource)},"changes":[{"type":"create","timestamp":${Json.encodeToString(createTimestamp)},"resource":${Json.encodeToString(serializedResource)}},{"type":"update","timestamp":${Json.encodeToString(updateTimestamp)},"patch":${Json.encodeToString(patch)}},{"type":"delete","timestamp":${Json.encodeToString(deleteTimestamp)}}]}"""
+      """{"resourceId":${Json.encodeToString(resourceId)},"resourceType":${Json.encodeToString(resourceType)},"lastUpdateTimestamp":${Json.encodeToString(lastUpdateTimestamp)},"serializedResource":${Json.encodeToString(serializedResource)},"changes":[{"type":"create","timestamp":${Json.encodeToString(createTimestamp)},"resource":${Json.encodeToString(serializedResource)}},{"type":"update","timestamp":${Json.encodeToString(updateTimestamp)},"patch":${Json.encodeToString(patch)}},{"type":"delete","timestamp":${Json.encodeToString(deleteTimestamp)}}]}"""
 
     val decoded: SyncPayload = Json.decodeFromString(payload)
 
     assertThat(decoded.resourceId).isEqualTo(resourceId)
     assertThat(decoded.resourceType).isEqualTo(ResourceType.Patient)
-    assertThat(decoded.lastUpdatedDate).isEqualTo(lastUpdatedDate)
+    assertThat(decoded.lastUpdateTimestamp).isEqualTo(lastUpdateTimestamp)
     assertThat(decoded.serializedResource).isEqualTo(serializedResource)
     assertThat(decoded.changes)
       .isEqualTo(

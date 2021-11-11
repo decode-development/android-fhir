@@ -25,7 +25,7 @@ import org.hl7.fhir.r4.model.ResourceType
 data class SyncPayload(
   val resourceId: String,
   val resourceType: ResourceType,
-  val lastUpdatedDate: String,
+  val lastUpdateTimestamp: String,
   val serializedResource: String,
   /**
    * The list of changes which have been made to the resource since it was last updated from the
