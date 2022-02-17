@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.db
 
+import androidx.room.RoomDatabase
 import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.SquashedLocalChange
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
@@ -25,7 +26,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /** The interface for the FHIR resource database. */
-internal interface Database {
+interface Database {
   /**
    * Inserts a list of local `resources` into the FHIR resource database. If any of the resources
    * already exists, it will be overwritten.
@@ -41,6 +42,14 @@ internal interface Database {
    * @param <R> The resource type
    */
   suspend fun <R : Resource> insertRemote(vararg resource: R)
+
+  /**
+   * Replaces the resource and local changes in the FHIR resource database.
+   *
+   * @param resource The [Resource]
+   * @param changes The [List] of [LocalChangeEntity] which have not yet been synced to the server
+   */
+  suspend fun <R : Resource> replaceLocalWithRemote(resource: R, changes: List<LocalChangeEntity>)
 
   /**
    * Updates the `resource` in the FHIR resource database. If the resource does not already exist,
@@ -96,4 +105,9 @@ internal interface Database {
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
+
+  /**
+   * @see RoomDatabase
+   */
+  suspend fun <R> withTransaction(block: suspend () -> R): R
 }
